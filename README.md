@@ -1,5 +1,9 @@
 # Coc Zig
 
+![Zig Language Server](./.github/assets/zls.svg)
+
+[Coc.nvim](https://github.com/neoclide/coc.nvim) wrapper for [ZLS](https://github.com/zigtools/zls).
+
 ## Install
 
 In you Neovim run:
