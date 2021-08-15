@@ -1,5 +1,5 @@
 /** System-wide constants. Useful to have everything on one place */
 
-import { lspName } from '../package.json';
+const LSP_NAME = 'zig-language-server';
 
-export { lspName };
+export { LSP_NAME };
