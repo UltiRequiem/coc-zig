@@ -1,7 +1,7 @@
 {
   "name": "coc-zig",
-  "version": "0.0.0-development",
-  "description": "",
+  "version": "0.1.1",
+  "description": "Zig language server provider extension using ZLS for coc.nvim",
   "author": "Eliaz Bobadilla <eliaz.bobadilladev@gmail.com>",
   "license": "MIT",
   "main": "lib/index.js",

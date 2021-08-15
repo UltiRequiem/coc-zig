@@ -1,7 +1,8 @@
 // eslint-disable-next-line import/no-unresolved
-import { LanguageClientOptions, ExtensionContext, services, workspace, LanguageClient } from 'coc.nvim';
+import { LanguageClientOptions, window, ExtensionContext, services, workspace, LanguageClient } from 'coc.nvim';
 import getExecutable from './zlsExecutable';
 import { lspName } from './constants';
+import registerCommand from './commands';
 
 async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('zls');
@@ -20,12 +21,9 @@ async function activate(context: ExtensionContext): Promise<void> {
   const client = new LanguageClient('zls', lspName, serverOptions, clientOptions);
   context.subscriptions.push(services.registLanguageClient(client));
 
-  client.onReady().then(() => {
-    if (!config.get<boolean>('startupMessage', false)) {
-      return;
-    }
-    workspace.showMessage("coc-zls Running");
-  });
+  if (config.get<boolean>('startUpMessage', true)) {
+    window.showMessage('${lspName} running!');
+  }
 }
 
 export default activate;
