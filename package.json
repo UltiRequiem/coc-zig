@@ -41,20 +41,14 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "coc-zig configuration",
+      "title": "coc-zls configuration",
       "properties": {
-        "coc-zig.enabled": {
+        "coc-zls.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable coc-zig extension"
+          "description": "Enable coc-zls extension"
         }
       }
-    },
-    "commands": [
-      {
-        "command": "coc-zig.Command",
-        "title": "coc-zig command title"
-      }
-    ]
+    }
   }
 }

@@ -1,18 +1,8 @@
-# coc-chuy
-
-
+# Coc Zig
 
 ## Install
 
-`:CocInstall coc-chuy`
-
-## Keymaps
-
-`nmap <silent> <C-l> <Plug>(coc-coc-chuy-keymap)`
-
-## Lists
-
-`:CocList demo_list`
+`:CocInstall coc-zls`
 
 ## License
 

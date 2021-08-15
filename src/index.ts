@@ -1,7 +1,7 @@
 import { ExtensionContext, services, workspace, LanguageClient } from 'coc.nvim';
 
 async function activate(context: ExtensionContext): Promise<void> {
-  const config = workspace.getConfiguration('coc-zig');
+  const config = workspace.getConfiguration('coc-zls');
 
   if (!config.get<boolean>('enable', true)) return;
 
