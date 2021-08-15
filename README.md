@@ -1,8 +1,6 @@
 # Coc Zig
 
-![Zig Language Server](./.github/assets/zls.svg)
-
-[Coc.nvim](https://github.com/neoclide/coc.nvim) wrapper for [ZLS](https://github.com/zigtools/zls).
+[Coc.nvim](https://github.com/neoclide/coc.nvim) wrapper for the [Zig Language Server](https://github.com/zigtools/zls).
 
 ## Install
 
