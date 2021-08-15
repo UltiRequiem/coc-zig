@@ -36,10 +36,12 @@ async function activate(context: ExtensionContext): Promise<void> {
   };
 
   const client = new LanguageClient('zls', LSP_NAME, serverOptions, clientOptions);
+
+  // Client Start
   context.subscriptions.push(services.registLanguageClient(client));
 
   if (config.get<boolean>('startUpMessage', true)) {
-    window.showMessage('${lspName} running!');
+    window.showMessage(`${LSP_NAME} running!`);
   }
 }
 

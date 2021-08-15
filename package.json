@@ -1,6 +1,6 @@
 {
   "name": "coc-zig",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Zig language server provider extension using ZLS for coc.nvim",
   "author": "Eliaz Bobadilla <eliaz.bobadilladev@gmail.com>",
   "license": "MIT",
@@ -57,6 +57,14 @@
           "type": "boolean",
           "default": true,
           "description": "Enable Startup message for coc-zig"
+        },
+        "zig.path": {
+          "type": "string",
+          "description": "ZSL Path"
+        },
+        "zig.debugLog": {
+          "type": "boolean",
+          "default": false
         }
       }
     }
