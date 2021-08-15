@@ -24,14 +24,19 @@
     "semi": true
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.8.2",
-    "@typescript-eslint/parser": "^4.8.2",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
     "coc.nvim": "^0.0.80",
     "esbuild": "^0.8.42",
-    "eslint": "^7.14.0",
-    "eslint-config-prettier": "^8.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin": "^1.0.1",
+    "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.2.0",
+    "prettier": "^2.3.2",
+    "prettier-eslint": "^13.0.0",
+    "prettier-plugin-jsdoc": "^0.3.23",
     "rimraf": "^3.0.2",
     "typescript": "^4.1.2"
   },
@@ -43,7 +48,7 @@
       "type": "object",
       "title": "coc-zls configuration",
       "properties": {
-        "coc-zls.enabled": {
+        "zls.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable coc-zls extension"
