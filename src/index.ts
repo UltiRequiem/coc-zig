@@ -3,14 +3,13 @@ import {
   LanguageClientOptions,
   ServerOptions,
   window,
+  commands,
   ExtensionContext,
   services,
   workspace,
   LanguageClient,
 } from "coc.nvim";
 import { LSP_NAME } from "./constants";
-
-import setCommand from "./commands";
 
 async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration("zig");
@@ -53,11 +52,11 @@ async function activate(context: ExtensionContext): Promise<void> {
     window.showMessage(`${LSP_NAME} running!`);
   }
 
-  setCommand("start", () => client.start());
+  commands.registerCommand("start", () => client.start());
 
-  setCommand("stop", async () => await client.stop());
+  commands.registerCommand("stop", async () => await client.stop());
 
-  setCommand("restart", async () => {
+  commands.registerCommand("restart", async () => {
     await client.stop();
     client.start();
   });

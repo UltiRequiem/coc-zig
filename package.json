@@ -1,6 +1,6 @@
 {
   "name": "coc-zig",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Zig language server provider extension using ZLS for coc.nvim",
   "author": "Eliaz Bobadilla <eliaz.bobadilladev@gmail.com>",
   "license": "MIT",
@@ -73,6 +73,22 @@
         "title": "Start the server",
         "category": "Zig",
         "command": "zig.start"
+      },
+      {
+        "title": "Stop the server",
+        "category": "Zig",
+        "command": "zig.stop"
+      },
+      {
+        "title": "Restart the server",
+        "category": "Zig",
+        "command": "zig.restart"
+      }
+    ],
+    "snippets": [
+      {
+        "language":"zig",
+        "path":"./snippets.json"
       }
     ]
   }
