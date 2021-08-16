@@ -1,12 +1,16 @@
 {
   "name": "coc-zig",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Zig language server provider extension using ZLS for coc.nvim",
   "author": "Eliaz Bobadilla <eliaz.bobadilladev@gmail.com>",
   "license": "MIT",
   "main": "lib/index.js",
   "keywords": [
-    "coc.nvim"
+    "coc.nvim",
+    "ziglang",
+    "zls",
+    "languageserver",
+    "zig"
   ],
   "engines": {
     "coc": "^0.0.80"
@@ -17,11 +21,6 @@
     "watch": "node esbuild.js --watch",
     "build": "node esbuild.js",
     "prepare": "node esbuild.js"
-  },
-  "prettier": {
-    "singleQuote": true,
-    "printWidth": 120,
-    "semi": true
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.29.1",
@@ -41,7 +40,8 @@
     "typescript": "^4.1.2"
   },
   "activationEvents": [
-    "*"
+    "onLanguage:zig",
+    "onCommand:go.version"
   ],
   "contributes": {
     "configuration": {
@@ -67,6 +67,13 @@
           "default": false
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "title": "Start the server",
+        "category": "Zig",
+        "command": "zig.start"
+      }
+    ]
   }
 }
