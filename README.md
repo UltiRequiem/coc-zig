@@ -2,6 +2,19 @@
 
 [Coc.nvim](https://github.com/neoclide/coc.nvim) wrapper for the [Zig Language Server](https://github.com/zigtools/zls).
 
+Is recommended to use [zig.vim](https://github.com/ziglang/zig.vim) also.
+
+## Configuration
+
+If your `coc-settings`:
+
+```json
+  "zig.enabled": true,
+  "zig.startUpMessage": true,
+  "zig.path": "zls",
+  "zig.debugLog": false,
+```
+
 ## Install
 
 In you Neovim run:
