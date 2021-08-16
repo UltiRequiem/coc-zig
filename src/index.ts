@@ -10,6 +10,8 @@ import {
 } from 'coc.nvim';
 import { LSP_NAME } from './constants';
 
+import setCommand from './commands';
+
 async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('zig');
 
@@ -43,6 +45,15 @@ async function activate(context: ExtensionContext): Promise<void> {
   if (config.get<boolean>('startUpMessage', true)) {
     window.showMessage(`${LSP_NAME} running!`);
   }
+
+  setCommand('start', () => client.start());
+
+  setCommand('stop', async () => await client.stop());
+
+  setCommand('restart', async () => {
+    await client.stop();
+    client.start();
+  });
 }
 
 export default activate;
