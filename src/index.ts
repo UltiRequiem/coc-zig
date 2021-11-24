@@ -11,7 +11,7 @@ import {
 } from "coc.nvim";
 import { LSP_NAME } from "./constants";
 
-async function activate(context: ExtensionContext): Promise<void> {
+export default async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration("zig");
 
   const zlsPath = config.get("path", "");
@@ -61,5 +61,3 @@ async function activate(context: ExtensionContext): Promise<void> {
     client.start();
   });
 }
-
-export default activate;
