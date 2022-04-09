@@ -17,7 +17,7 @@ export default async function activate(context: ExtensionContext): Promise<void>
   const zlsPath = config.get("path", "");
 
   // To turn off the extension
-  if (!config.get<boolean>("enable", true)) {
+  if (!config.get<boolean>("enabled", true)) {
     return;
   }
 
