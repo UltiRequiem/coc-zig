@@ -15,6 +15,11 @@
   "engines": {
     "coc": "^0.0.80"
   },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/ultirequiem"
+  },
+  "repository": "github:ultirequiem/coc-zig",
   "scripts": {
     "lint": "xo src",
     "clean": "rimraf lib",

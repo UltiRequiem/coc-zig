@@ -7,7 +7,7 @@ Is recommended to use [zig.vim](https://github.com/ziglang/zig.vim) also.
 
 ## Configuration
 
-If your `coc-settings`:
+If your `coc-settings.json`:
 
 ```json
 "zig.enabled": true,
@@ -18,23 +18,32 @@ If your `coc-settings`:
 
 ## Install
 
-In you Neovim run:
+In you Neovim run 🚀
 
 ```
 :CocInstall coc-zig
 ```
 
-Or using Packer:
+Using an external plugin manager 👇
+
+> ⚠ This is not recommended by the coc.nvim team
 
 ```lua
 use {'UltiRequiem/coc-zig', run='yarn install --frozen-lockfile && yarn build'}
 ```
 
-## License
+## Support
 
-coc-zig is licensed under the [MIT License](./LICENSE)
+Open an Issue, I will check it a soon as possible 👀
 
----
+If you want to hurry me up a bit
+[send me a tweet](https://twitter.com/UltiRequiem) 😆
 
-> This extension is built with
-> [create-coc-extension](https://github.com/fannheyward/create-coc-extension)
+Consider [supporting me on Patreon](https://patreon.com/UltiRequiem) if you like
+my work 🙏
+
+Don't forget to start the repo ⭐
+
+## Licence
+
+Licensed under the MIT License 📄
