@@ -16,28 +16,18 @@
     "coc": "^0.0.80"
   },
   "scripts": {
-    "lint": "eslint src --ext ts",
+    "lint": "xo src",
     "clean": "rimraf lib",
     "watch": "node esbuild.js --watch",
     "build": "node esbuild.js",
     "prepare": "node esbuild.js"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.29.1",
-    "@typescript-eslint/parser": "^4.29.1",
     "coc.nvim": "^0.0.80",
     "esbuild": "^0.8.42",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin": "^1.0.1",
-    "eslint-plugin-import": "^2.24.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.3.2",
-    "prettier-eslint": "^13.0.0",
-    "prettier-plugin-jsdoc": "^0.3.23",
     "rimraf": "^3.0.2",
-    "typescript": "^4.1.2"
+    "typescript": "^4.1.2",
+    "xo": "^0.48.0"
   },
   "activationEvents": [
     "onLanguage:zig",
@@ -87,9 +77,14 @@
     ],
     "snippets": [
       {
-        "language":"zig",
-        "path":"./snippets.json"
+        "language": "zig",
+        "path": "./snippets.json"
       }
     ]
+  },
+  "xo": {
+    "rules": {
+      "import/extensions": "off"
+    }
   }
 }

@@ -1,63 +1,59 @@
-// eslint-disable-next-line import/no-unresolved
 import {
-  LanguageClientOptions,
-  ServerOptions,
-  window,
-  commands,
-  ExtensionContext,
-  services,
-  workspace,
-  LanguageClient,
-} from "coc.nvim";
-import { LSP_NAME } from "./constants";
+	commands,
+	ExtensionContext,
+	LanguageClient,
+	LanguageClientOptions,
+	ServerOptions,
+	services,
+	window,
+	workspace,
+} from 'coc.nvim';
+import {lspName} from './constants';
 
-export async function activate(context: ExtensionContext): Promise<void> {
-  const config = workspace.getConfiguration("zig");
+export async function activate(context: ExtensionContext) {
+	const config = workspace.getConfiguration('zig');
 
-  const zlsPath = config.get("path", "");
+	const command = config.get('path', '');
 
-  // To turn off the extension
-  if (!config.get<boolean>("enabled", true)) {
-    return;
-  }
+	if (!config.get('enabled', true)) {
+		return;
+	}
 
-  if (!zlsPath) {
-    window.showErrorMessage(
-      "Failed to find zls executable! Please specify its path in your settings."
-    );
-    return;
-  }
+	if (!command) {
+		return window.showErrorMessage(
+			'Failed to find the zls executable! Please specify its path in your settings.',
+		);
+	}
 
-  const serverOptions: ServerOptions = {
-    command: zlsPath,
-    args: config.get<boolean>("debugLog", false) ? ["--debug-log"] : [],
-  };
+	const serverOptions: ServerOptions = {
+		command,
+		args: config.get('debugLog', false) ? ['--debug-log'] : [],
+	};
 
-  const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: "file", language: "zig" }],
-    outputChannel: window.createOutputChannel("Zig Language Server"),
-  };
+	const clientOptions: LanguageClientOptions = {
+		documentSelector: [{scheme: 'file', language: 'zig'}],
+		outputChannel: window.createOutputChannel('Zig Language Server'),
+	};
 
-  const client = new LanguageClient(
-    "zls",
-    LSP_NAME,
-    serverOptions,
-    clientOptions
-  );
+	const client = new LanguageClient(
+		'zls',
+		lspName,
+		serverOptions,
+		clientOptions,
+	);
 
-  // Client Start
-  context.subscriptions.push(services.registLanguageClient(client));
+	context.subscriptions.push(services.registLanguageClient(client));
 
-  if (config.get<boolean>("startUpMessage", true)) {
-    window.showMessage(`${LSP_NAME} running!`);
-  }
+	if (config.get('startUpMessage', true)) {
+		window.showMessage(`${lspName} running!`);
+	}
 
-  commands.registerCommand("start", () => client.start());
+	commands.registerCommand('start', client.start);
 
-  commands.registerCommand("stop", async () => await client.stop());
+	commands.registerCommand('stop', client.stop);
 
-  commands.registerCommand("restart", async () => {
-    await client.stop();
-    client.start();
-  });
+	commands.registerCommand('restart', async () => {
+		await client.stop();
+		client.start();
+	});
 }
