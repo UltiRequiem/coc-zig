@@ -28,6 +28,8 @@ Using an external plugin manager 👇
 
 > ⚠ This is not recommended by the coc.nvim team
 
+Packer example 📦
+
 ```lua
 use {'UltiRequiem/coc-zig', run='yarn install --frozen-lockfile && yarn build'}
 ```
