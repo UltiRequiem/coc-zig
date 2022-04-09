@@ -11,7 +11,7 @@ import {
 } from "coc.nvim";
 import { LSP_NAME } from "./constants";
 
-export default async function activate(context: ExtensionContext): Promise<void> {
+export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration("zig");
 
   const zlsPath = config.get("path", "");
