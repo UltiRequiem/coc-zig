@@ -55,7 +55,7 @@
         },
         "zig.path": {
           "type": "string",
-          "description": "ZSL Path"
+          "description": "ZLS Path"
         },
         "zig.debugLog": {
           "type": "boolean",
