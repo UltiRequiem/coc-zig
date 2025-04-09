@@ -30,14 +30,14 @@ jobs:
         run: |
           TAG="${{ github.event.release.tag_name }}"
           echo "Updating package.json version to $TAG"
-          npm version "$TAG" --no-git-tag-version
+          yarn version --new-version "$TAG"
 
       - name: Commit and push version update
         run: |
           TAG="${{ github.event.release.tag_name }}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add package.json package-lock.json
+          git add package.json yarn.lock
           git commit -m "Update package.json to version $TAG"
           git push origin ${{ github.event.repository.default_branch }}
         env:
