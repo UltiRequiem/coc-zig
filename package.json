@@ -32,7 +32,7 @@
     "esbuild": "^0.28.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.1.2",
-    "xo": "^0.48.0"
+    "xo": "^0.60.0"
   },
   "activationEvents": [
     "onLanguage:zig",
