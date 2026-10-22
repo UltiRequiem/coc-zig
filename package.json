@@ -15,10 +15,6 @@
   "engines": {
     "coc": "^0.0.80"
   },
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/ultirequiem"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/UltiRequiem/coc-zig.git"
