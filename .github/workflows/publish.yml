@@ -1,11 +1,22 @@
 name: Publish
 
-# Every push to main publishes a new version to npm and creates a GitHub
-# Release. Add "[skip release]" to a commit message to opt out.
+# Releases to npm (trusted publishing) and creates a GitHub Release.
+#  - every push to the default branch, unless the commit message has "[skip release]"
+#  - a daily check: merges made with the built-in GITHUB_TOKEN (Dependabot auto-merge)
+#    do not trigger other workflows, so this catches anything not released yet
+#  - manually, with an optional bump (patch / minor / major)
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "17 6 * * *"
   workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump (auto reads the commit message)
+        type: choice
+        options: [auto, patch, minor, major]
+        default: auto
 
 permissions:
   contents: write
@@ -16,11 +27,38 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    name: Is there something to release?
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.decide.outputs.release }}
+    steps:
+      - id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MSG=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA" --jq .commit.message)
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$MSG" == *"[skip release]"* ]]; then
+            echo "Commit asks to skip the release"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+            LAST=$(gh release view --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish 2>/dev/null || echo none)
+            if [[ "$LAST" == "$GITHUB_SHA" ]]; then
+              echo "Latest release already covers $GITHUB_SHA"
+              echo "release=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "release=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
   publish:
     name: Publish to npm
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      !contains(github.event.head_commit.message, '[skip release]')
+    needs: check
+    if: needs.check.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -38,15 +76,22 @@ jobs:
       - name: Compute next version
         id: version
         env:
-          MESSAGE: ${{ github.event.head_commit.message }}
+          GH_TOKEN: ${{ github.token }}
         run: |
+          MESSAGE=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA" --jq .commit.message)
           NAME=$(node -p "require('./package.json').name")
           CURRENT=$(npm view "$NAME" version 2>/dev/null || echo "0.0.0")
           IFS=. read -r MAJOR MINOR PATCH <<< "$CURRENT"
           SUBJECT=$(printf '%s' "$MESSAGE" | head -n 1)
-          if [[ "$SUBJECT" == *":boom:"* || "$SUBJECT" == *"!:"* ]]; then
+          BUMP="${{ inputs.bump }}"
+          if [[ -z "$BUMP" || "$BUMP" == "auto" ]]; then
+            if [[ "$SUBJECT" == *":boom:"* || "$SUBJECT" == *"!:"* ]]; then BUMP=major
+            elif [[ "$SUBJECT" == *":sparkles:"* || "$SUBJECT" == feat* ]]; then BUMP=minor
+            else BUMP=patch; fi
+          fi
+          if [[ "$BUMP" == "major" ]]; then
             NEXT="$((MAJOR + 1)).0.0"
-          elif [[ "$SUBJECT" == *":sparkles:"* || "$SUBJECT" == feat* ]]; then
+          elif [[ "$BUMP" == "minor" ]]; then
             NEXT="$MAJOR.$((MINOR + 1)).0"
           else
             NEXT="$MAJOR.$MINOR.$((PATCH + 1))"
