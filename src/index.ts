@@ -19,7 +19,7 @@ export async function activate(context: ExtensionContext) {
 
 	const command = config.get('path', '');
 
-	if (!command) {
+	if (command === '') {
 		return window.showErrorMessage(
 			'Failed to find the zls executable! Please specify its path in your settings.',
 		);
@@ -45,15 +45,20 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(services.registLanguageClient(client));
 
 	if (config.get('startUpMessage', true)) {
-		window.showMessage(`${lspName} running!`);
+		void window.showInformationMessage(`${lspName} running!`);
 	}
 
-	commands.registerCommand('start', client.start);
-
-	commands.registerCommand('stop', client.stop);
-
-	commands.registerCommand('restart', async () => {
-		await client.stop();
+	commands.registerCommand('start', () => {
 		client.start();
+	});
+
+	commands.registerCommand('stop', () => {
+		void client.stop();
+	});
+
+	commands.registerCommand('restart', () => {
+		void client.stop().then(() => {
+			client.start();
+		});
 	});
 }
