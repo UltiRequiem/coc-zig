@@ -34,8 +34,8 @@
     "coc.nvim": "^0.0.82",
     "esbuild": "^0.28.2",
     "rimraf": "^6.1.3",
-    "typescript": "^4.1.2",
-    "xo": "^0.60.0"
+    "typescript": "^6.0.3",
+    "xo": "^5.0.1"
   },
   "activationEvents": [
     "onLanguage:zig",
@@ -90,10 +90,9 @@
       }
     ]
   },
-  "xo": {
-    "rules": {
-      "import/extensions": "off"
-    }
-  },
-  "packageManager": "pnpm@12.6.0"
+  "packageManager": "pnpm@12.6.0",
+  "files": [
+    "lib",
+    "src/snippets.json"
+  ]
 }
