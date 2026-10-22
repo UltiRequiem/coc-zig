@@ -19,7 +19,10 @@
     "type": "patreon",
     "url": "https://www.patreon.com/ultirequiem"
   },
-  "repository": "github:ultirequiem/coc-zig",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UltiRequiem/coc-zig.git"
+  },
   "scripts": {
     "lint": "xo src",
     "clean": "rimraf lib",
