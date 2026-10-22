@@ -1,0 +1,66 @@
+name: Publish
+
+# Every push to main publishes a new version to npm and creates a GitHub
+# Release. Add "[skip release]" to a commit message to opt out.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to npm
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      !contains(github.event.head_commit.message, '[skip release]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+
+      # Next version = latest published version bumped by commit message:
+      # :boom: or "!:" -> major, :sparkles: or "feat" -> minor, else patch.
+      - name: Compute next version
+        id: version
+        env:
+          MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          CURRENT=$(npm view "$NAME" version 2>/dev/null || echo "0.0.0")
+          IFS=. read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          SUBJECT=$(printf '%s' "$MESSAGE" | head -n 1)
+          if [[ "$SUBJECT" == *":boom:"* || "$SUBJECT" == *"!:"* ]]; then
+            NEXT="$((MAJOR + 1)).0.0"
+          elif [[ "$SUBJECT" == *":sparkles:"* || "$SUBJECT" == feat* ]]; then
+            NEXT="$MAJOR.$((MINOR + 1)).0"
+          else
+            NEXT="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          echo "Releasing $NAME $CURRENT -> $NEXT"
+
+      - run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version
+      - run: pnpm run build
+      - run: npm publish --access public
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "v${{ steps.version.outputs.version }}"
+          --target "$GITHUB_SHA" --generate-notes
