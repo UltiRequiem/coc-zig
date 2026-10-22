@@ -54,8 +54,13 @@ jobs:
           echo "version=$NEXT" >> "$GITHUB_OUTPUT"
           echo "Releasing $NAME $CURRENT -> $NEXT"
 
-      - run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version
+      - run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version --allow-same-version
       - run: pnpm run build
+      - name: Verify entry points exist
+        run: >-
+          node -e "const p=require('./package.json');
+          const bin=typeof p.bin==='string'?[p.bin]:Object.values(p.bin??{});
+          for(const f of [p.main,...bin].filter(Boolean))require('fs').accessSync(f)"
       - run: npm publish --access public
 
       - name: Create GitHub Release
