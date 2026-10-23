@@ -37,20 +37,39 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          MSG=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA" --jq .commit.message)
+          REPO="$GITHUB_REPOSITORY"
+          MSG=$(gh api "repos/$REPO/commits/$GITHUB_SHA" --jq .commit.message)
+
+          # files changed outside .github/ (a workflow-only commit, like a Dependabot action bump, ships nothing)
+          shipped() {
+            if [[ -n "${1:-}" ]]; then
+              gh api "repos/$REPO/compare/$1...$GITHUB_SHA" --jq '[.files[].filename] | map(select(startswith(".github/") | not)) | length'
+            else
+              gh api "repos/$REPO/commits/$GITHUB_SHA" --jq '[.files[].filename] | map(select(startswith(".github/") | not)) | length'
+            fi
+          }
+
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "release=true" >> "$GITHUB_OUTPUT"
           elif [[ "$MSG" == *"[skip release]"* ]]; then
             echo "Commit asks to skip the release"
             echo "release=false" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event_name }}" == "schedule" ]]; then
-            LAST=$(gh release view --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq .targetCommitish 2>/dev/null || echo none)
+            TAG=$(gh release list --repo "$REPO" --limit 1 --json tagName --jq '.[0].tagName // ""')
+            LAST=""
+            [[ -n "$TAG" ]] && LAST=$(gh api "repos/$REPO/git/ref/tags/$TAG" --jq .object.sha 2>/dev/null || echo "")
             if [[ "$LAST" == "$GITHUB_SHA" ]]; then
               echo "Latest release already covers $GITHUB_SHA"
+              echo "release=false" >> "$GITHUB_OUTPUT"
+            elif [[ -n "$LAST" && "$(shipped "$LAST")" == "0" ]]; then
+              echo "Only workflow files changed since $TAG"
               echo "release=false" >> "$GITHUB_OUTPUT"
             else
               echo "release=true" >> "$GITHUB_OUTPUT"
             fi
+          elif [[ "$(shipped "")" == "0" ]]; then
+            echo "Only workflow files changed, nothing to release"
+            echo "release=false" >> "$GITHUB_OUTPUT"
           else
             echo "release=true" >> "$GITHUB_OUTPUT"
           fi
@@ -80,7 +99,10 @@ jobs:
         run: |
           MESSAGE=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA" --jq .commit.message)
           NAME=$(node -p "require('./package.json').name")
-          CURRENT=$(npm view "$NAME" version 2>/dev/null || echo "0.0.0")
+          # npm's read API lags a publish by minutes, so also look at the GitHub releases and take the higher
+          NPM_V=$(npm view "$NAME" version 2>/dev/null || echo "0.0.0")
+          REL_V=$(gh release list --limit 30 --json tagName --jq '.[].tagName' | sed 's/^v//' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)
+          CURRENT=$(printf '%s\n%s\n' "$NPM_V" "${REL_V:-0.0.0}" | sort -V | tail -1)
           IFS=. read -r MAJOR MINOR PATCH <<< "$CURRENT"
           SUBJECT=$(printf '%s' "$MESSAGE" | head -n 1)
           BUMP="${{ inputs.bump }}"
@@ -106,9 +128,23 @@ jobs:
           node -e "const p=require('./package.json');
           const bin=typeof p.bin==='string'?[p.bin]:Object.values(p.bin??{});
           for(const f of [p.main,...bin].filter(Boolean))require('fs').accessSync(f)"
-      - run: npm publish --access public
+      - name: Publish to npm
+        id: npm_publish
+        run: |
+          set -o pipefail
+          if ! npm publish --access public 2>&1 | tee publish.log; then
+            if grep -q "cannot publish over the previously published" publish.log; then
+              echo "::notice::${{ steps.version.outputs.version }} is already on npm (a previous run published it)."
+              echo "skipped=true" >> "$GITHUB_OUTPUT"
+            else
+              exit 1
+            fi
+          fi
 
+      # npm is the product: a missing GitHub Release must not turn a successful publish red.
       - name: Create GitHub Release
+        if: steps.npm_publish.outputs.skipped != 'true'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -116,5 +152,6 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists, skipping"
           else
-            gh release create "$TAG" --target "$GITHUB_SHA" --generate-notes
+            gh release create "$TAG" --target "$GITHUB_SHA" --generate-notes \
+              || echo "::warning::Could not create release $TAG (the built-in token cannot tag some commits)."
           fi
