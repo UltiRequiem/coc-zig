@@ -22,8 +22,18 @@ jobs:
     steps:
       # Every update type, majors included: the ruleset's required CI check decides
       # whether it actually merges (auto-merge waits for it).
+      #
+      # The built-in token can never merge a PR that edits .github/workflows/*
+      # ("refusing to allow a GitHub App to create or update workflow ... without workflows
+      # permission"), which is what Dependabot's action-version bumps are. Those are left for a
+      # human or the sweep tool instead of failing this job.
       - name: Enable auto-merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: |
+          if gh pr diff "$PR_URL" --name-only | grep -q '^\.github/workflows/'; then
+            echo "::notice::This PR edits workflow files, which the built-in token cannot merge. Merge it by hand."
+            exit 0
+          fi
+          gh pr merge --auto --squash "$PR_URL"
